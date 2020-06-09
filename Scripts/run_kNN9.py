@@ -7,6 +7,8 @@ import pandas as pd
 import time as tm
 from sklearn.neighbors import KNeighborsClassifier
 import rpy2.robjects as robjects
+import SparseMatrix as sm
+
 
 
 def run_kNN9(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
@@ -38,12 +40,13 @@ def run_kNN9(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", 
     train_ind = np.array(robjects.r['Train_Idx'])
 
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
     labels = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
 
     labels = labels.iloc[tokeep]
     data = data.iloc[tokeep]
-
+    data = data.fillna("0").astype(int)
+    
     # read the feature file
     if (NumGenes > 0):
         features = pd.read_csv(GeneOrderPath,header=0,index_col=None, sep=',')
@@ -99,4 +102,4 @@ def run_kNN9(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", 
     ts_time.to_csv(str(OutputDir / Path("kNN9_test_time.csv")),
                    index = False)
 
-run_kNN50(argv[1], argv[2], argv[3], argv[4], argv[5], int(argv[6]))
+run_kNN9(argv[1], argv[2], argv[3], argv[4], argv[5], int(argv[6]))

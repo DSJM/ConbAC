@@ -76,11 +76,11 @@ rule generate_datafile:
     input: 
         refdata = config["refdatafile"],
         testdata = config["testdatafile"]
-    output: "{output_dir}/datafile.csv"
+    output: datafile=directory("{output_dir}/data_combined")
     log: "{output_dir}/datafile.log"
 
     shell:
-        "Rscript Count_Aggregation.R "
+        "Rscript Count_Aggregation_MM.R "
         "{input.refdata} "
         "{input.testdata} "
         "{wildcards.output_dir} "
@@ -109,7 +109,7 @@ Rule for creating feature rank lists
 """
 rule generate_dropouts_feature_rankings:
     input:
-        datafile = "{output_dir}/datafile.csv",
+        datafile = rules.generate_datafile.output,
         folds = "{output_dir}/CV_folds.RData"
     output: "{output_dir}/rank_genes_dropouts.csv"
     log: "{output_dir}/rank_genes_dropouts.log"
@@ -128,7 +128,7 @@ Rule for R based tools.
 """
 rule singleCellNet:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -153,7 +153,7 @@ rule singleCellNet:
 
 rule scmapcell:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -178,7 +178,7 @@ rule scmapcell:
 
 rule scmapcluster:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -203,7 +203,7 @@ rule scmapcluster:
 
 rule scID:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -227,7 +227,7 @@ rule scID:
 
 rule CHETAH:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -249,33 +249,56 @@ rule CHETAH:
     "{params.n_features} "
     "&> {log}"
 
-rule Seurat:
+rule SeuratCCA:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
   output:
-    pred = "{output_dir}/Seurat/Seurat_pred.csv",
-    true = "{output_dir}/Seurat/Seurat_true.csv",
-    total_time = "{output_dir}/Seurat/Seurat_total_time.csv"
-  log: "{output_dir}/Seurat/Seurat.log"
+    pred = "{output_dir}/Seurat_CCA/Seurat_CCA_pred.csv",
+    true = "{output_dir}/Seurat_CCA/Seurat_CCA_true.csv",
+    total_time = "{output_dir}/Seurat_CCA/Seurat_CCA_total_time.csv"
+  log: "{output_dir}/Seurat_CCA/Seurat_CCA.log"
   params:
     n_features = config.get("number_of_features", 0)
   shell:
-    "Rscript Scripts/run_Seurat_Integration.R "
+    "Rscript Scripts/run_Seurat_Transfer_CCA.R "
     "{input.datafile} "
     "{input.labfile} "
     "{input.folds} "
-    "{wildcards.output_dir}/Seurat "
+    "{wildcards.output_dir}/Seurat_CCA "
     "{input.ranking} "
     "{params.n_features} "
     "&> {log}"
-    
+
+
+rule SeuratPCA:
+  input:
+    datafile = rules.generate_datafile.output,
+    labfile = "{output_dir}/labfile.csv",
+    folds = "{output_dir}/CV_folds.RData",
+    ranking = feature_ranking
+  output:
+    pred = "{output_dir}/Seurat_PCA/Seurat_PCA_pred.csv",
+    true = "{output_dir}/Seurat_PCA/Seurat_PCA_true.csv",
+    total_time = "{output_dir}/Seurat_PCA/Seurat_PCA_total_time.csv"
+  log: "{output_dir}/Seurat_PCA/Seurat_PCA.log"
+  params:
+    n_features = config.get("number_of_features", 0)
+  shell:
+    "Rscript Scripts/run_Seurat_Transfer_PCA.R "
+    "{input.datafile} "
+    "{input.labfile} "
+    "{input.folds} "
+    "{wildcards.output_dir}/Seurat_PCA "
+    "{input.ranking} "
+    "{params.n_features} "
+    "&> {log}"   
     
 rule SingleR:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -300,7 +323,7 @@ rule SingleR:
 #NOTE non-conformant to the rest of the rules.
 rule Garnett_CV:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     genes_names = config.get("genes", "UNSPECIFIEDFILE"),
@@ -329,7 +352,7 @@ rule Garnett_CV:
 #NOTE non-conformant to the rest of the rules.
 rule Garnett_Pretrained: #TODO test this
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     genes_names = config.get("genes", "UNSPECIFIEDFILE"),
@@ -360,7 +383,7 @@ Rules for python based tools.
 """
 rule kNN50:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -385,7 +408,7 @@ rule kNN50:
 
 rule kNN9:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -410,7 +433,7 @@ rule kNN9:
 
 rule Cell_BLAST:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -435,7 +458,7 @@ rule Cell_BLAST:
 
 rule scVI:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -460,7 +483,7 @@ rule scVI:
 
 rule LDA:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -485,7 +508,7 @@ rule LDA:
 
 rule LDA_rejection:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -510,7 +533,7 @@ rule LDA_rejection:
 
 rule NMC:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -535,7 +558,7 @@ rule NMC:
 
 rule RF:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -560,7 +583,7 @@ rule RF:
 
 rule SVM:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking
@@ -585,7 +608,7 @@ rule SVM:
 
 rule SVM_rejection:
   input:
-    datafile = "{output_dir}/datafile.csv",
+    datafile = rules.generate_datafile.output,
     labfile = "{output_dir}/labfile.csv",
     folds = "{output_dir}/CV_folds.RData",
     ranking = feature_ranking

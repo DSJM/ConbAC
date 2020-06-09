@@ -1,5 +1,7 @@
 args <- commandArgs(TRUE)
 
+
+
 run_CHETAH<-function(DataPath,LabelsPath,CV_RDataPath,OutputDir,GeneOrderPath = NULL,NumGenes = NULL){
   "
   run CHETAH
@@ -17,8 +19,8 @@ run_CHETAH<-function(DataPath,LabelsPath,CV_RDataPath,OutputDir,GeneOrderPath = 
   defining the genes order for each cross validation fold, default is NULL.
   NumGenes : Number of genes used in case of feature selection (integer), default is NULL.
   "
-  
-  Data <- read.csv(DataPath,row.names = 1)
+  source("SparseMatrix.R")
+  Data <- Read10x_New(DataPath)
   Labels <- as.matrix(read.csv(LabelsPath))
   load(CV_RDataPath)
   Labels <- as.vector(Labels[,col_Index])

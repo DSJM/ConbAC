@@ -6,6 +6,7 @@ import rpy2.robjects as robjects
 import numpy as np
 import pandas as pd
 from sklearn import linear_model
+import SparseMatrix as sm
 
 
 def rank_gene_dropouts(DataPath, CV_RDataPath, OutputDir):
@@ -28,8 +29,9 @@ def rank_gene_dropouts(DataPath, CV_RDataPath, OutputDir):
     train_ind = np.array(robjects.r['Train_Idx'])
 
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
     data = data.iloc[tokeep]
+    data = data.fillna("0").astype(int)
     data = np.log2(data+1)
 
     genes = np.zeros([np.shape(data)[1],np.squeeze(nfolds)], dtype = '>U10')

@@ -7,6 +7,7 @@ import pandas as pd
 import time as tm
 from sklearn.neighbors import NearestCentroid
 import rpy2.robjects as robjects
+import SparseMatrix as sm
 
 
 def run_NMC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
@@ -38,11 +39,12 @@ def run_NMC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
     train_ind = np.array(robjects.r['Train_Idx'])
 
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
     labels = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
 
     labels = labels.iloc[tokeep]
     data = data.iloc[tokeep]
+    data = data.fillna("0").astype(int)
 
     # read the feature file
     if (NumGenes > 0):
@@ -89,11 +91,16 @@ def run_NMC(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
     tr_time = pd.DataFrame(tr_time)
     ts_time = pd.DataFrame(ts_time)
 
-    OutputDir = Path(OutputDir)
-    truelab.to_csv(str(OutputDir / Path("NMC_true.csv")),
-                   index = False)
+    OutputDir = Path(OutputDir)
+
+    truelab.to_csv(str(OutputDir / Path("NMC_true.csv")),
+
+                   index = False)
+
     pred.to_csv(str(OutputDir / Path("NMC_pred.csv")),
-                index = False)
+    
+            index = False)
+
     tr_time.to_csv(str(OutputDir / Path("NMC_training_time.csv")),
                    index = False)
     ts_time.to_csv(str(OutputDir / Path("NMC_test_time.csv")),

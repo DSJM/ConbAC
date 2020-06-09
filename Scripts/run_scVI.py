@@ -9,6 +9,8 @@ from scvi.models import SCANVI
 from scvi.inference import SemiSupervisedTrainer
 import time as tm
 import rpy2.robjects as robjects
+import SparseMatrix as sm
+
 
 def run_scVI(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
     '''
@@ -39,11 +41,12 @@ def run_scVI(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", 
     train_ind = np.array(robjects.r['Train_Idx'])
 
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
     labels = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
 
     labels = labels.iloc[tokeep]
-    data = data.iloc[tokeep] 
+    data = data.iloc[tokeep]
+    data = data.fillna("0").astype(int)
     
     # read the feature file
     if (NumGenes > 0):

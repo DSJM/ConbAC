@@ -34,7 +34,8 @@ run_Garnett_Pretrained <- function(DataPath, LabelsPath, GenesPath, CV_RDataPath
   labels <- as.matrix(read.csv(LabelsPath))
   labels <- labels[Cells_to_Keep]
   
-  mat <- read.table(DataPath, sep = ",")
+  source("SparseMatrix.R")
+  mat <- Read10x_New(DataPath)
   data <- mat[-1,-1]
   data <- data[Cells_to_Keep,]
   data <- t(data) #ensure that the genes are rows, and the cells are columns

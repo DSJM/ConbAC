@@ -16,6 +16,8 @@ import scipy.io as sio
 import optunity as opt
 from tensorflow.contrib.tensor_forest.python import tensor_forest
 from tensorflow.python.ops import resources
+import SparseMatrix as sm
+
 
 
 def run_LAmbDA(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
@@ -47,11 +49,12 @@ def run_LAmbDA(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = ""
     train_ind = np.array(robjects.r['Train_Idx'])
 
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
     labels = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
-    
+
     labels = labels.iloc[tokeep]
     data = data.iloc[tokeep]
+    data = data.fillna("0").astype(int)
     
     # read the feature file
     if (NumGenes > 0):

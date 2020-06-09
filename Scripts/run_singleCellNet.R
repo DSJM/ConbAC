@@ -17,8 +17,8 @@ run_singleCellNet<-function(DataPath,LabelsPath,CV_RDataPath,OutputDir,GeneOrder
   defining the genes order for each cross validation fold, default is NULL.
   NumGenes : Number of genes used in case of feature selection (integer), default is NULL.
   "
-
-  Data <- read.csv(DataPath,row.names = 1)
+  source("SparseMatrix.R")
+  Data <- Read10x_New(DataPath)
   colnames(Data) <- gsub('_','.',colnames(Data), fixed = TRUE)
   Labels <- as.matrix(read.csv(LabelsPath))
   load(CV_RDataPath)

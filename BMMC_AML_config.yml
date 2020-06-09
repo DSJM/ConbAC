@@ -1,0 +1,23 @@
+output_dir: BMMC_AML/output
+refdatafile: BMMC_AML/bmmc_Ref
+reflabelfile: BMMC_AML/bmmc_labels.csv
+testdatafile: BMMC_AML/AML_S01_CITE
+testclusterfile: BMMC_AML/AML_Cluster.csv
+column: 1
+number_of_features: 2000
+tools_to_run:
+  - scVI
+  - scmapcell 
+  - Seurat_CCA
+  - Seurat_PCA
+  - SVM
+  - SVM_rejection
+  - LDA
+  - LDA_rejection
+  - RF
+  - singleCellNet
+  - CHETAH
+  - scmapcluster
+  - SingleR
+  - scID
+

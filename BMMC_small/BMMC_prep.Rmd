@@ -1,0 +1,59 @@
+---
+title: "BMMC_Subsetting for tests"
+author: "David Mentrup"
+Start date: "13-05-2020"
+Current version date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+  fig_width: 20 
+  fig_height: 8 
+
+---
+?
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment=NA, fig.width=15, fig.height=6)
+
+
+```
+
+## 1.0 Loading Packages
+```{r}
+setwd("~/CAC_01/Snakemake_CAC//BMMC_small")
+source('~/CAC_01/Snakemake_CAC/Seurat_to_MM.R')
+library(dplyr)
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+
+packageVersion("dplyr")
+packageVersion("Seurat")
+```
+
+```{r}
+bmmc_all <- readRDS("~/HeterogenetyAML/StoredRObj/bmmc_Annot_Ref.rds")
+```
+
+
+```{r}
+cells.subset.1 <- base::sample(x = Cells(bmmc_all), size = 4000, replace = F)
+
+# Get a vector of cell names for the remaining cells (subset 2)
+cells.subset.2 <- sample(x = subset(x = Cells(bmmc_all), subset = !(Cells(bmmc_all) %in% cells.subset.1)), size = 1000, replace = F)
+
+# Create 2 subsetted objects, each formed by the corresponding cells
+# Set 'do.clean = T' if you want to keep only the 'data' and 'raw.data' slots
+bmmc4000 <- subset(bmmc_all, cells = cells.subset.1)
+bmmc1000 <- subset(bmmc_all, cells = cells.subset.2)
+
+```
+
+
+## Storing Labels and Countmatrix as CSV (TrainSet)
+
+```{r}
+Seurat_to_MM(bmmc4000, bmmc4000$celltype, "BMMC_Ref_Label.csv", "BMMC_Ref_count")
+Seurat_to_MM(bmmc1000, bmmc1000$seurat_clusters, "BMMC_Test_Label.csv", "BMMC_Test_count")
+```
+

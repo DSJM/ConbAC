@@ -7,6 +7,8 @@ import pandas as pd
 import time as tm
 from sklearn.svm import LinearSVC
 import rpy2.robjects as robjects
+import SparseMatrix as sm
+
 
 
 def run_SVM(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
@@ -38,12 +40,13 @@ def run_SVM(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
     train_ind = np.array(robjects.r['Train_Idx'])
 
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
     labels = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
 
     labels = labels.iloc[tokeep]
     data = data.iloc[tokeep]
-
+    data = data.fillna("0").astype(int)
+    
     # read the feature file
     if (NumGenes > 0):
         features = pd.read_csv(GeneOrderPath,header=0,index_col=None, sep=',')
@@ -94,7 +97,8 @@ def run_SVM(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", N
                    index = False)
     pred.to_csv(str(OutputDir / Path("SVM_pred.csv")),
                 index = False)
-    tr_time.to_csv(str(OutputDir / Path("SVM_training_time.csv")),
+    tr_time.to_csv(str(OutputDir / Path("SVM_training_time.csv")),
+
                    index = False)
     ts_time.to_csv(str(OutputDir / Path("SVM_test_time.csv")),
                    index = False)

@@ -4,6 +4,8 @@ import scripts.DigitalCellSorter as DigitalCellSorter
 import os
 import time as tm
 import rpy2.robjects as robjects
+import SparseMatrix as sm
+
 
 def run_DigitalCellSorter(DataPath, LabelsPath, CV_RDataPath, GeneListPath, OutputDir, GeneOrderPath = "", NumGenes = 0):
     '''
@@ -32,11 +34,12 @@ def run_DigitalCellSorter(DataPath, LabelsPath, CV_RDataPath, GeneListPath, Outp
     col = col - 1
     
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
+    labels = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
+
+    labels = labels.iloc[tokeep]
     data = data.iloc[tokeep]
-    
-    truelab = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
-    truelab = truelab.iloc[tokeep]
+    data = data.fillna("0").astype(int)
 
 
     # read the feature file

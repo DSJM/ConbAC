@@ -7,6 +7,8 @@ import pandas as pd
 import time as tm
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import rpy2.robjects as robjects
+import SparseMatrix as sm
+
 
 
 def run_LDA_rejection(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPath = "", NumGenes = 0, Threshold = 0.7):
@@ -39,11 +41,12 @@ def run_LDA_rejection(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPa
     train_ind = np.array(robjects.r['Train_Idx'])
 
     # read the data
-    data = pd.read_csv(DataPath,index_col=0,sep=',')
+    data = sm.importMM(DataPath)
     labels = pd.read_csv(LabelsPath, header=0,index_col=None, sep=',', usecols = col)
 
     labels = labels.iloc[tokeep]
     data = data.iloc[tokeep]
+    data = data.fillna("0").astype(int)
 
     # read the feature file
     if (NumGenes > 0):
@@ -105,4 +108,4 @@ def run_LDA_rejection(DataPath, LabelsPath, CV_RDataPath, OutputDir, GeneOrderPa
     ts_time.to_csv(str(OutputDir / Path("LDA_rejection_test_time.csv")),
                    index = False)
 
-run_LDA(argv[1], argv[2], argv[3], argv[4], argv[5], int(argv[6]))
+run_LDA_rejection(argv[1], argv[2], argv[3], argv[4], argv[5], int(argv[6]))

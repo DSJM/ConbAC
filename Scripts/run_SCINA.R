@@ -12,8 +12,8 @@ run_SCINA<-function(DataPath,LabelsPath,GeneSigPath,OutputDir){
   GeneSigPath : Cell type marker genes file path (.csv)
   OutputDir : Output directory defining the path of the exported file.
   "
-  
-  Data <- read.csv(DataPath,row.names = 1)
+  source("SparseMatrix.R")
+  Data <- Read10x_New(DataPath)
   Labels <- as.vector(as.matrix(read.csv(LabelsPath)))
   Data <- Data[is.element(Labels,c('CD14+ Monocyte','CD19+ B','CD56+ NK')),]
   Labels <- Labels[is.element(Labels,c('CD14+ Monocyte','CD19+ B','CD56+ NK'))]

@@ -16,7 +16,8 @@ run_scmap <- function(DataPath,LabelsPath,CV_RDataPath,OutputDir,GeneOrderPath =
   NumGenes : Number of genes used in case of feature selection (integer), default is NULL.
   "
   
-  Data <- read.csv(DataPath,row.names = 1)
+  source("SparseMatrix.R")
+  Data <- Read10x_New(DataPath)
   Labels <- as.matrix(read.csv(LabelsPath))
   load(CV_RDataPath)
   Labels <- as.vector(Labels[,col_Index])

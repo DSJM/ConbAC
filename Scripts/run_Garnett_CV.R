@@ -35,7 +35,8 @@ run_Garnett_CV <- function(DataPath, LabelsPath, CV_RDataPath, GenesPath, Marker
   labels <- labels[Cells_to_Keep]
   
   # read the data
-  mat <- read.table(DataPath, sep = ",")
+  source("SparseMatrix.R")
+  mat <- Read10x_New(DataPath)
   data <- mat[-1,-1]
   data <- data[Cells_to_Keep,]
   data <- t(data) #ensure that the genes are rows, and the cells are columns
