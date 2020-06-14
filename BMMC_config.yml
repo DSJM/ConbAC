@@ -1,0 +1,12 @@
+output_dir: BMMC_small/output
+refdatafile: BMMC_small/BMMC_Ref_count
+reflabelfile: BMMC_small/BMMC_Ref_Label.csv
+testdatafile: BMMC_small/BMMC_Test_count
+testclusterfile: BMMC_small/BMMC_Test_Label.csv
+column: 1
+number_of_features: 2000
+tools_to_run:
+  - CHETAH
+  - SVM_rejection
+  - scVI
+  - SingleR

@@ -79,7 +79,7 @@ run_Seurat_Transfer_PCA<-function(DataPath,LabelsPath,CV_RDataPath,OutputDir,Gen
     
     # Seurat Integration    
     start_time <- Sys.time()
-    seur.anchors <- FindTransferAnchors(reference = seur_Train, query = seur_Test,reduction = "pcaproject",features = selected.genes, dims = 1:30, npcs =3 0)
+    seur.anchors <- FindTransferAnchors(reference = seur_Train, query = seur_Test,reduction = "pcaproject",features = selected.genes, dims = 1:30, npcs =30)
     predictions <- TransferData(anchorset = seur.anchors, refdata = seur_Train@meta.data$Celltype, weight.reduction = "pcaproject", dims = 1:30)
     seur_Test <- AddMetaData(seur_Test, metadata = predictions)
     

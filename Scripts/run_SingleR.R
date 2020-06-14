@@ -44,12 +44,12 @@ run_SingleR<-function(DataPath,LabelsPath,CV_RDataPath,OutputDir,GeneOrderPath =
       start_time <- Sys.time()
       singler = SingleR(method = "single", Data[as.vector(GenesOrder[c(1:NumGenes),i])+1,Test_Idx[[i]]],
                         Data[as.vector(GenesOrder[c(1:NumGenes),i])+1,Train_Idx[[i]]],
-                        Labels[Train_Idx[[i]]], numCores = 1)
+                        Labels[Train_Idx[[i]]], numCores = 12)
       end_time <- Sys.time()
     }
     else{
       start_time <- Sys.time()
-      singler = SingleR(method = "single", Data[,Test_Idx[[i]]], Data[,Train_Idx[[i]]], Labels[Train_Idx[[i]]], numCores = 1)
+      singler = SingleR(method = "single", Data[,Test_Idx[[i]]], Data[,Train_Idx[[i]]], Labels[Train_Idx[[i]]], numCores = 12)
       end_time <- Sys.time()
     }
     Total_Time_SingleR[i] <- as.numeric(difftime(end_time,start_time,units = 'secs'))

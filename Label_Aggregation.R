@@ -1,6 +1,6 @@
 args <- commandArgs(TRUE)
 
-Label_Aggregation <- function(TrainLabels, TestLabels, OutputDir){
+Label_Aggregation <- function(TrainLabelP, TestLabelP, OutputDir){
   "
   CITE_Validation
   Function combines Train and Test set and returns train and test indices, 
@@ -16,10 +16,13 @@ Label_Aggregation <- function(TrainLabels, TestLabels, OutputDir){
   "
 
   
-  TrainLabels <- as.matrix(read.csv(TrainLabels, header = TRUE))
+  TrainLabels <- as.matrix(read.csv(TrainLabelP, header = TRUE))
+  TestLabels <- as.matrix(read.csv(paste0(TestLabelP, '/barcodes.tsv'), header = FALSE))
+  TestLabels <- matrix("XXX", dim(TestLabels)[1], dim(TrainLabels)[2])
   TrainLabels <- cbind(TrainLabels, rep("Train", length(TrainLabels)))
   
-  TestLabels <- as.matrix(read.csv(TestLabels, header = TRUE))
+
+
   TestLabels <- cbind(TestLabels, rep("Test", length(TestLabels)))
   
   Labels <- rbind(TrainLabels, TestLabels)

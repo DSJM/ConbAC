@@ -58,14 +58,14 @@ Rule for creating labfile
 rule generate_labfile:
   input: 
       reflabel = config["reflabelfile"],
-      testcluster = config["testclusterfile"]
+      testbarcodes = config["testdatafile"]
   output: "{output_dir}/labfile.csv"
   log: "{output_dir}/labfile.log"
 
   shell:
     "Rscript Label_Aggregation.R "
     "{input.reflabel} "
-    "{input.testcluster} "
+    "{input.testbarcodes} "
     "{wildcards.output_dir} "
     "&> {log}"
 

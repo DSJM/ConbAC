@@ -4,10 +4,10 @@ TrueLabelsPath <- args[1]
 PredLabelsPath <- args[2]
 OutputDir <- args[3]
 ToolName <- args[4]
-columnCluster <- args[5]
+columnCluster <- as.integer(args[5])
 
 
-evaluate <- function(TrueLabelsPath, PredLabelsPath, Indices = NULL){
+evaluate <- function(TrueLabelsPath, PredLabelsPath, column = 1, Indices = NULL){
   "
   Script to evaluate the performance of the classifier.
   It returns multiple evaluation measures: the confusion matrix, median F1-score, F1-score for each class, accuracy, percentage of unlabeled, population size. 
@@ -30,7 +30,9 @@ evaluate <- function(TrueLabelsPath, PredLabelsPath, Indices = NULL){
   PopSize : number of cells per cell type
   "
   
-  true_lab <- unlist(read.csv(TrueLabelsPath))
+  true_lab <- read.csv(TrueLabelsPath)
+  true_lab <- true_lab[column]
+  true_lab <- unlist(true_lab)
   pred_lab <- unlist(read.csv(PredLabelsPath))
   
   if (! is.null(Indices)){
@@ -45,7 +47,8 @@ evaluate <- function(TrueLabelsPath, PredLabelsPath, Indices = NULL){
   conf <- table(true_lab,pred_lab)
   pop_size <- rowSums(conf)
   
-  pred_lab = gsub('Node..','Node',pred_lab)
+  pred_lab = gsub('Node.','Node',pred_lab)
+  pred_lab = gsub('Node.','Node',pred_lab)
   
   conf_F1 <- table(true_lab,pred_lab,exclude = c('unassigned','Unassigned','Unknown','rand','Node','ambiguous','unknown'))
 
@@ -89,7 +92,7 @@ evaluate <- function(TrueLabelsPath, PredLabelsPath, Indices = NULL){
   return(result)
 }
 
-results <- evaluate(TrueLabelsPath, PredLabelsPath)
+results <- evaluate(TrueLabelsPath, PredLabelsPath, column = columnCluster)
 write.csv(results$Conf, file.path(OutputDir, "Confusion", paste0(ToolName, ".csv")))
 write.csv(results$F1, file.path(OutputDir, "F1", paste0(ToolName, ".csv")))
 write.csv(results$PopSize, file.path(OutputDir, "PopSize", paste0(ToolName, ".csv")))
