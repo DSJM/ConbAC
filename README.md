@@ -1,4 +1,4 @@
-# Clusterbased automated consensus annotation tool (CAC)
+# Automated consensus-based annotation of cell clusters (ConbAC)
 
 This tool is based on the scRNAseq_Benchmark by tabdelaal 
 -> https://github.com/tabdelaal/scRNAseq_Benchmark/tree/master/Snakemake
